@@ -105,6 +105,51 @@ public class LargeInt {
 		return p;
 	}
 	
+	public int[] multiDAC(){
+		int[] result = new int[a.length+b.length];
+		multiDAC(result,a,b,0,a.length-1,0,b.length-1);
+		
+		for(int i = result.length-1;i>0;i--){
+			if(result[i] >= 10){
+				int X = result[i];
+				result[i] = X % 10;
+				result[i-1] += X / 10;
+			}
+		}
+		for(int i = result.length-1;i>0;i--){
+			result[i] = result[i-1];
+			if(i==1){
+				if(result[i]>=10){
+					int X = result[i];
+					result[i] = X % 10;
+					result[i-1] = X / 10;
+				}
+				else{
+					result[i-1] =0;
+				}
+			}
+		}
+		return result;
+	}
+	
+	private int[] multiDAC(int[] result,int[] A,int[] B,int startA,int endA,int startB,int endB){
+		
+		if(startA == endA && startB == endB){
+			int X = A[startA]*B[startB];
+			result[startA+startB] += X;
+		}
+		else{
+			
+			multiDAC(result,A,B,startA,Math.floorDiv(endA+startA,2),startB,Math.floorDiv(endB+startB,2));
+			multiDAC(result,A,B,startA,Math.floorDiv(endA+startA,2),(int)Math.ceil((endB+startB)/2.0),endB);
+			multiDAC(result,A,B,(int)Math.ceil((endA+startA)/2.0),endA,startB,Math.floorDiv(endB+startB,2));
+			multiDAC(result,A,B,(int)Math.ceil((endA+startA)/2.0),endA,(int)Math.ceil((endB+startB)/2.0),endB);
+			
+		}
+		
+		return result;
+	}
+	
 	public String toString(){
 		String s ="A: ";
 		s+=getA()+", B: "+getB();
