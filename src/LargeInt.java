@@ -107,26 +107,14 @@ public class LargeInt {
 	
 	public int[] multiDAC(){
 		int[] result = new int[a.length+b.length];
-		multiDAC(result,a,b,0,a.length-1,0,b.length-1);
 		
-		for(int i = result.length-1;i>0;i--){
+		multiDAC(result,a,b,0,a.length-1,0,b.length-1);/// divide
+		///////////////////////////////////////////////// &
+		for(int i = result.length-1;i>0;i--){/////////// conquer
 			if(result[i] >= 10){
 				int X = result[i];
 				result[i] = X % 10;
 				result[i-1] += X / 10;
-			}
-		}
-		for(int i = result.length-1;i>0;i--){
-			result[i] = result[i-1];
-			if(i==1){
-				if(result[i]>=10){
-					int X = result[i];
-					result[i] = X % 10;
-					result[i-1] = X / 10;
-				}
-				else{
-					result[i-1] =0;
-				}
 			}
 		}
 		return result;
@@ -134,16 +122,34 @@ public class LargeInt {
 	
 	private int[] multiDAC(int[] result,int[] A,int[] B,int startA,int endA,int startB,int endB){
 		
-		if(startA == endA && startB == endB){
-			int X = A[startA]*B[startB];
-			result[startA+startB] += X;
+		int offsetA =(endA-startA+1)%2;
+		int offsetB =(endB-startB+1)%2;
+		int Afloor = Math.floorDiv(endA+startA,2)-offsetA;
+		int Aceil = (int)Math.ceil((endA+startA)/2.0);
+		int Bfloor = Math.floorDiv(endB+startB,2)-offsetB;
+		int Bceil = (int)Math.ceil((endB+startB)/2.0);
+		
+		if(startA == endA ){
+			if(startB == endB){ // ^AA ^BB
+				int X = A[startA]*B[startB];
+				result[startA+startB+1] += X;
+			}
+			else{ // ^AA !BB
+				multiDAC(result,A,B,startA,endA,startB,Bfloor);
+				multiDAC(result,A,B,startA,endA,Bceil,endB);
+			}
 		}
 		else{
-			
-			multiDAC(result,A,B,startA,Math.floorDiv(endA+startA,2),startB,Math.floorDiv(endB+startB,2));
-			multiDAC(result,A,B,startA,Math.floorDiv(endA+startA,2),(int)Math.ceil((endB+startB)/2.0),endB);
-			multiDAC(result,A,B,(int)Math.ceil((endA+startA)/2.0),endA,startB,Math.floorDiv(endB+startB,2));
-			multiDAC(result,A,B,(int)Math.ceil((endA+startA)/2.0),endA,(int)Math.ceil((endB+startB)/2.0),endB);
+			if(startB == endB){ // !AA ^BB
+				multiDAC(result,A,B,startA,Afloor,startB,endB);
+				multiDAC(result,A,B,Aceil,endA,startB,endB);
+			}
+			else{ // !AA !BB
+				multiDAC(result,A,B,startA,Afloor,startB,Bfloor);
+				multiDAC(result,A,B,startA,Afloor,Bceil,endB);
+				multiDAC(result,A,B,Aceil,endA,startB,Bfloor);
+				multiDAC(result,A,B,Aceil,endA,Bceil,endB);
+			}
 			
 		}
 		
